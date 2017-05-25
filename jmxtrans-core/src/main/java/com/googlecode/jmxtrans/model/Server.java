@@ -24,9 +24,9 @@ package com.googlecode.jmxtrans.model;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -105,6 +105,7 @@ public class Server implements JmxConnectionProvider {
 	private static final String BACK = "/jmxrmi";
 
 	private static final Logger logger = LoggerFactory.getLogger(Server.class);
+	public static final String SECURE_PREFIX = "secure:";
 
 	/**
 	 * Some writers (GraphiteWriter) use the alias in generation of the unique
@@ -227,10 +228,10 @@ public class Server implements JmxConnectionProvider {
 		this.alias = alias;
 		this.pid = pid;
 		this.port = port;
-		this.username = username;
-		this.password = password;
+		this.username = decodeCredential(url, username);
+		this.password = decodeCredential(url, password);
 		this.protocolProviderPackages = protocolProviderPackages;
-		this.url = url;
+		this.url = decodeUrl(url);
 		this.cronExpression = cronExpression;
 		if (!isNullOrEmpty(cronExpression)) {
 			logger.warn("cronExpression is deprecated, please use runPeriodSeconds instead.");
@@ -256,6 +257,18 @@ public class Server implements JmxConnectionProvider {
 		this.pool = checkNotNull(pool);
 		this.outputWriterFactories = ImmutableList.copyOf(firstNonNull(outputWriterFactories, ImmutableList.<OutputWriterFactory>of()));
 		this.outputWriters = ImmutableList.copyOf(firstNonNull(outputWriters, ImmutableList.<OutputWriter>of()));
+	}
+
+	private String decodeUrl(String url) {
+		return url != null ? url.replace(SECURE_PREFIX, "") : null;
+	}
+
+	private boolean requireSecureCredentials(String url) {
+		return url != null && url.startsWith(SECURE_PREFIX);
+	}
+
+	private String decodeCredential(String url, String credential) {
+		return requireSecureCredentials(url) ? new Decrypt().decrypt(credential) : credential;
 	}
 
 	public Iterable<Result> execute(Query query) throws Exception {

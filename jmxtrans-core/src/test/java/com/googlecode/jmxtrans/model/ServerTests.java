@@ -37,6 +37,7 @@ import java.io.IOException;
 
 import static com.googlecode.jmxtrans.model.ServerFixtures.createPool;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -54,6 +55,34 @@ import static org.mockito.Mockito.when;
  */
 @Category(RequiresIO.class)
 public class ServerTests {
+
+	@Test
+	public void testEncryptedCredentials() throws Exception {
+		Server server = Server.builder()
+				.setUrl("secure:service:jmx:remoting-jmx://mysys.mydomain:8004")
+				.setUsername("5121E035F5FB72E7")
+				.setPassword("0D5DABD2B6FFE6AD")
+				.setPool(createPool())
+				.build();
+
+		assertEquals(server.getUsername(), "user");
+		assertEquals(server.getPassword(), "pass");
+		assertEquals(server.getUrl(), "service:jmx:remoting-jmx://mysys.mydomain:8004");
+	}
+
+	@Test
+	public void testPlainTextCredentials() throws Exception {
+		Server server = Server.builder()
+				.setUrl("service:jmx:remoting-jmx://mysys.mydomain:8004")
+				.setUsername("user")
+				.setPassword("pass")
+				.setPool(createPool())
+				.build();
+
+		assertEquals(server.getUsername(), "user");
+		assertEquals(server.getPassword(), "pass");
+		assertEquals(server.getUrl(), "service:jmx:remoting-jmx://mysys.mydomain:8004");
+	}
 
 	@Test
 	public void testGetUrl() {
