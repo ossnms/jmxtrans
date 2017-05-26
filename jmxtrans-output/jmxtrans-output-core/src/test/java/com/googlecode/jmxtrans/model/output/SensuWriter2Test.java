@@ -44,11 +44,11 @@ public class SensuWriter2Test {
 		sensuWriter.write(writer, ServerFixtures.dummyServer(), QueryFixtures.dummyQuery(), ResultFixtures.dummyResults());
 
 		assertThat(writer.toString()).isEqualTo(
-				"{\n" +
-				"  \"name\" : \"jmxtrans\",\n" +
-				"  \"type\" : \"metric\",\n" +
-				"  \"handler\" : \"graphite\",\n" +
-				"  \"output\" : \"host_example_net_4321.MemoryAlias.ObjectPendingFinalizationCount 10 0\\n\"\n" +
+				"{" + System.lineSeparator() +
+				"  \"name\" : \"jmxtrans\"," + System.lineSeparator() +
+				"  \"type\" : \"metric\"," + System.lineSeparator() +
+				"  \"handler\" : \"graphite\"," + System.lineSeparator() +
+				"  \"output\" : \"host_example_net_4321.MemoryAlias.ObjectPendingFinalizationCount 10 0\\n\"" + System.lineSeparator() +
 				"}");
 	}
 
