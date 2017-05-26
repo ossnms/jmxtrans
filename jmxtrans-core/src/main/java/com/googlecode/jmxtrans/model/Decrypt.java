@@ -30,6 +30,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
+import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -57,13 +58,17 @@ public class Decrypt {
 		try {
 			final Cipher cipher = Cipher.getInstance(CIPHER_STRING);
 			final IvParameterSpec parameterSpec = new IvParameterSpec(INIT_VECTOR);
-			final SecretKey secretKey = new SecretKeySpec(KEY.getBytes(), "DES");
+			final SecretKey secretKey = new SecretKeySpec(KEY.getBytes(getCharset()), "DES");
 			cipher.init(type == CipherType.DECRYPT ? 2 : 1, secretKey, parameterSpec);
 			return cipher;
 		} catch (NoSuchAlgorithmException|NoSuchPaddingException
 				|InvalidAlgorithmParameterException|InvalidKeyException ex) {
 			throw new IllegalStateException(ex);
 		}
+	}
+
+	private static Charset getCharset() {
+		return Charset.forName("UTF8");
 	}
 
 	synchronized String decrypt(final String encryptedString) {
@@ -73,7 +78,7 @@ public class Decrypt {
 		try {
 			final byte[] decryptedBytes =
 					buildCipher(CipherType.DECRYPT).doFinal(DatatypeConverter.parseHexBinary(encryptedString));
-			return new String(decryptedBytes);
+			return new String(decryptedBytes, getCharset());
 		} catch (IllegalBlockSizeException | BadPaddingException ex) {
 			throw new IllegalStateException(ex);
 		}
@@ -84,7 +89,8 @@ public class Decrypt {
 			return null;
 		}
 		try {
-			final byte[] encryptedBytes = buildCipher(CipherType.ENCRYPT).doFinal(original.getBytes());
+			final byte[] encryptedBytes = buildCipher(CipherType.ENCRYPT)
+					.doFinal(original.getBytes(getCharset()));
 			return DatatypeConverter.printHexBinary(encryptedBytes);
 		} catch (IllegalBlockSizeException | BadPaddingException ex) {
 			throw new IllegalStateException(ex);
