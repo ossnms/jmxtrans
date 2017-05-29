@@ -36,6 +36,7 @@ import javax.management.ObjectName;
 import java.io.IOException;
 
 import static com.googlecode.jmxtrans.model.ServerFixtures.createPool;
+import static java.lang.System.out;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
@@ -57,11 +58,23 @@ import static org.mockito.Mockito.when;
 public class ServerTests {
 
 	@Test
+	public void testCredentialEncryptionDecryption() throws Exception {
+		final Decrypt decrypt = new Decrypt();
+		final String userPlain = "user";
+		final String passPlain = "pass";
+		final String userCrypt = decrypt.encrypt(userPlain);
+		final String passCrypt = decrypt.encrypt(passPlain);
+
+		assertEquals(decrypt.decrypt(userCrypt), userPlain);
+		assertEquals(decrypt.decrypt(passCrypt), passPlain);
+	}
+
+	@Test
 	public void testEncryptedCredentials() throws Exception {
 		Server server = Server.builder()
 				.setUrl("secure:service:jmx:remoting-jmx://mysys.mydomain:8004")
-				.setUsername("5121E035F5FB72E7")
-				.setPassword("0D5DABD2B6FFE6AD")
+				.setUsername("388351AA9A114D46")
+				.setPassword("92875DFAD8287D34")
 				.setPool(createPool())
 				.build();
 
