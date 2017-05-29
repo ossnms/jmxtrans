@@ -29,7 +29,7 @@
 	<parent>
 		<groupId>org.jmxtrans</groupId>
 		<artifactId>jmxtrans-parent</artifactId>
-		<version>266-ossnms-001</version>
+		<version>266-ossnms-002-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>jmxtrans</artifactId>
