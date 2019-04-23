@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.NotDirectoryException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.atLeastOnce;
@@ -102,7 +103,7 @@ public class WatchDirTest {
 		try {
 			new WatchDir(watchedDir.newFile("toWatch"), callback);
 		} catch (IOException ioe) {
-			assertThat(ioe).hasMessageEndingWith("is not a directory");
+			assertThat(ioe).isInstanceOf(NotDirectoryException.class);
 			throw ioe;
 		}
 	}
